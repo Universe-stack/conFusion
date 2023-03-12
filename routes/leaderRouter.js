@@ -1,40 +1,89 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 
+const mongoose =require("mongoose");
+
+
+mongoose.Promise = global.Promise;
+const Leaders =require('../models/leaders');
+
 const leaderRouter=express.Router();
 leaderRouter.use(bodyParser.json());
 
 
 leaderRouter.route('/')
-.all((req,res,next)=>{
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
-})
 .get((req,res,next)=>{
-    res.end("Would send all the results")
+    Leaders.find({})
+    .then((leader)=> {
+        res.statusCode =200;
+        res.setHeader('Content-Type', 'application/json'); 
+        res.json(leader)
+    },(err)=>next(err))
+    .catch((err)=> next(err));
 })
 .post((req,res,next)=>{
-    res.end('Will send the request:'+ req.body.name+ 'with details:'+ req.body.description)
+    Leaders.create(req.body)
+    .then((leader)=> {
+        console.log('leader created', leader);
+        res.statusCode =200;
+        res.setHeader('Content-Type', 'application/json'); 
+        res.json(leader)
+    },(err)=>next(err))
+    .catch((err)=> next(err));
+})
+.put((req,res,next)=>{
+    res.statusCode = 403;
+    res.end('PUT not supported on /leaders')
 })
 .delete((req,res,next)=>{
-    res.end('Deleting all the request')
+    Leaders.remove({})
+    .then((resp)=> {
+        res.statusCode =200;
+        res.setHeader('Content-Type', 'application/json'); 
+        res.json(respr)
+    },(err)=>next(err))
+    .catch((err)=> next(err));
 });
 
 
 
 leaderRouter.route('/:leaderId')
 .get((req,res,next)=>{
-    res.end('Will send the details of the leader of' + req.params.leaderId)
+    Leaders.findById(req.params.leaderId)
+    .then((leader)=> {
+        if(req.params.leaderId){
+            res.statusCode =200;
+            res.setHeader('Content-Type', 'application/json'); 
+            res.json(leader)
+        }
+    },(err)=>next(err))
+    .catch((err)=> next(err));
 })
 .post((req,res,next)=>{
-    res.end('Will send the promo request:'+ req.body.name+ 'with details:'+ req.body.description)
+    res.statusCode = 403;
+    res.end('POST not supported on /leaders/:leaderId')
 })
 .put((req,res,next)=>{
-    res.end('Will update the promo request:'+ req.body.name+ 'with details:'+ req.body.description);
+    Leaders.findByIdAndUpdate(req.params.leaderId,
+        {
+            $set:req.body
+        }, {new: true}
+    )
+    .then((leader)=> {
+        res.statusCode =200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(leader);
+    },(err)=>next(err))
+    .catch((err)=> next(err))
 })
 .delete((req,res,next)=>{
-    res.end('Deleting all the request')
+    Leaders.findByIdAndRemove(req.params.leaderId)
+    .then((resp)=> {
+        res.statusCode =200;
+        res.setHeader('Content-Type', 'application/json'); 
+        res.json(respr)
+    },(err)=>next(err))
+    .catch((err)=> next(err));
 })
 
 
