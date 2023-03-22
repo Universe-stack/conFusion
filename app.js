@@ -1,3 +1,4 @@
+//require dependencies
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -5,25 +6,32 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
+var passport = require('passport');
+var authenticate = require('./authenticate');
 
+
+//require routers
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var dishRouter = require('./routes/dishRouter');
 var promoRouter = require('./routes/promoRouter');
 var leaderRouter = require('./routes/leaderRouter');
 
+//require mongoose
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
+//require models
 const Dishes= require('./models/dishes');
 const Promotions = require('./models/promotions');
 const Leaders = require('./models/leaders');
 
-
+//connet mongoose
 mongoose.connect('mongodb://localhost:27017/conFusion');
 let db =mongoose.connection;
 
+//Add entry to database
 const promotion1 = new Promotions({
   name: 'Justice Kachi',
   image: 'Justice.jpg',
@@ -89,6 +97,11 @@ db.once('open',function(){
   //console.log("connected to server");
 //},(err)=> {console.log(err);});
 
+
+
+
+
+//Express setup
 var app = express();
 
 // view engine setup
@@ -100,6 +113,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser('12345-67890-09876'));
 
+
+
+//Authentication
 app.use(session({
   name: "session-id",
   secret: '12345-67890-09876',
@@ -108,47 +124,22 @@ app.use(session({
   store: new FileStore()
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
 
+//Users can access the homepage and signup page before authenticating
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+
+// function auth
 function auth(req,res,next) {
-  console.log(req.session);
 
-  if(!req.session.user){
-      var authHeader = req.headers.authorization;
-
-      if(!authHeader) {
+  if(!req.user){
         var err = new Error('You are not authenticated');
-    
-        res.setHeader('WWW-Authenticate', 'Basic');
         err.status =401;
         next(err);
-      }
-    
-      var auth = new Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    //Buffer.from(string[, encoding]) instead.
-    
-      var username = auth[0];
-      var password = auth[1];
-    
-      if(username === 'admin' && password === 'password'){
-        req.session.user = 'admin';
-        next()
-      }
-      else {
-        var err = new Error('You are not authenticated');
-    
-        res.setHeader('WWW-Authenticate', 'Basic');
-        err.status =401;
-        next(err);
-      }
   }else{
-    if(req.session.user === 'admin') {
       next();
-    }
-    else {
-      var err = new Error('You are not authenticated');
-        err.status =401;
-        next(err);
-    }
   }
 }
 //6:30
@@ -156,12 +147,12 @@ function auth(req,res,next) {
 
 app.use(auth); //before the client can access the below middlewares
 
+// setup path
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+// setup router 
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/dishes',dishRouter);
 app.use('/promotions',promoRouter);
 app.use('/leaders',leaderRouter)
