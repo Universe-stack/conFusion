@@ -8,6 +8,7 @@ var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 var passport = require('passport');
 var authenticate = require('./authenticate');
+var config = require("./config");
 
 
 //require routers
@@ -19,7 +20,6 @@ var leaderRouter = require('./routes/leaderRouter');
 
 //require mongoose
 const mongoose = require('mongoose');
-
 mongoose.Promise = global.Promise;
 
 //require models
@@ -27,8 +27,9 @@ const Dishes= require('./models/dishes');
 const Promotions = require('./models/promotions');
 const Leaders = require('./models/leaders');
 
+const url = config.mongoUrl;
 //connet mongoose
-mongoose.connect('mongodb://localhost:27017/conFusion');
+mongoose.connect(url);
 let db =mongoose.connection;
 
 //Add entry to database
@@ -116,6 +117,7 @@ app.use(express.urlencoded({ extended: false }));
 
 
 //Authentication
+{/*
 app.use(session({
   name: "session-id",
   secret: '12345-67890-09876',
@@ -124,13 +126,19 @@ app.use(session({
   store: new FileStore()
 }));
 
+*/}
+
 app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.session());
 
 //Users can access the homepage and signup page before authenticating
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+
+
+
+{/*}
 // function auth
 function auth(req,res,next) {
 
@@ -147,6 +155,8 @@ function auth(req,res,next) {
 
 app.use(auth); //before the client can access the below middlewares
 
+*/}
+
 // setup path
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -156,6 +166,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/dishes',dishRouter);
 app.use('/promotions',promoRouter);
 app.use('/leaders',leaderRouter)
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

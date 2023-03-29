@@ -3,6 +3,9 @@ const bodyParser = require('body-parser');
 var User = require('../models/user');
 var router = express.Router();
 var passport = require('passport');
+//const { authenticate } = require('passport');
+
+var authenticate = require ('../authenticate');
 
 var router = express.Router();
 router.use(bodyParser.json());
@@ -34,19 +37,22 @@ router.post('/signup', (req,res,next)=> {
   })
 })
 
-//13:59
+//21:31
 
 
 //login
 router.post('/login', passport.authenticate('local'),(req, res,user)=>{
-          res.statusCode =200;
-          res.setHeader('Content-Type', 'application/json');
-          res.json({success: true, status: 'Login Successful', user:user })
+          
+    var token = authenticate.getToken({_id: req.user._id});
+    res.statusCode =200;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: true,token:token, status: 'Login Successful'})
+
 })
 
 
 router.get('/logout', (req,res)=>{
-
+  
   if (req.session) {
     req.session.destroy();
     res.clearCookie('session-id'); //session-id:name of cookie
