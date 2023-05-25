@@ -6,9 +6,7 @@ const commentSchema = new Schema({
 
     rating: {
         type: Number,
-        min:1,
-        max:5,
-        required:true
+        required:true,
     },
     comment: {
         type:String,
@@ -17,6 +15,9 @@ const commentSchema = new Schema({
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
+    },
+    date: {
+        type:Date,
     }
 
 });
@@ -48,10 +49,10 @@ const dishSchema= new Schema(
     price:{
         type:String,
         required:true,
-        min: 0
+        
     },
     featured:{
-        type:Boolean,
+        type:String,
         required:false
     },
     

@@ -16,7 +16,7 @@ promoRouter.use(bodyParser.json());
 promoRouter.route('/')
 .options(cors.corsWithOptions,(req,res)=>{ res.sendStatus(200)})
 .get(cors.cors,(req,res,next)=>{
-    Promotions.find({})
+    Promotions.find(req.query)
     .then((promos)=> {
         console.log("dishes found", promos)
         res.statusCode =200;

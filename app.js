@@ -18,6 +18,7 @@ var dishRouter = require('./routes/dishRouter');
 var promoRouter = require('./routes/promoRouter');
 var leaderRouter = require('./routes/leaderRouter');
 var uploadRouter = require('./routes/uploadRoutes');
+var favoriteRouter = require('./routes/favoritesRouter')
 
 //require mongoose
 const mongoose = require('mongoose');
@@ -27,6 +28,7 @@ mongoose.Promise = global.Promise;
 const Dishes= require('./models/dishes');
 const Promotions = require('./models/promotions');
 const Leaders = require('./models/leaders');
+const Favorites = require('./models/favorites')
 
 const url = config.mongoUrl;
 //connet mongoose
@@ -175,7 +177,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/dishes',dishRouter);
 app.use('/promotions',promoRouter);
 app.use('/leaders',leaderRouter);
-app.use('/imageUpload',uploadRouter)
+app.use('/imageUpload',uploadRouter);
+app.use('/favorites', favoriteRouter);
 
 
 
