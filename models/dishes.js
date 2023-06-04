@@ -1,26 +1,27 @@
 const mongoose= require('mongoose');
 const Schema = mongoose.Schema;
 
+//The structure of the react client data model is different from this. It doesn't contain comments as a sub model but rather
+//...features it as an individual model while attaching dishes id to each comment
+// const commentSchema = new Schema({
 
-const commentSchema = new Schema({
+//     rating: {
+//         type: Number,
+//         required:true,
+//     },
+//     comment: {
+//         type:String,
+//         required:true
+//     },
+//     author: {
+//         type: mongoose.Schema.Types.ObjectId,
+//         ref: 'User'
+//     },
+//     date: {
+//         type:Date,
+//     }
 
-    rating: {
-        type: Number,
-        required:true,
-    },
-    comment: {
-        type:String,
-        required:true
-    },
-    author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    },
-    date: {
-        type:Date,
-    }
-
-});
+// });
 
 const dishSchema= new Schema(
 
@@ -56,7 +57,7 @@ const dishSchema= new Schema(
         required:false
     },
     
-    comments: [commentSchema]
+    //comments: [commentSchema]
 },
 {
     timestamps:true
