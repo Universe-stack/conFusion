@@ -25,6 +25,8 @@ var commentRouter = require('./routes/commentRouter')
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
+mongoose.set('strictQuery', false);
+
 //require models
 const Dishes= require('./models/dishes');
 const Promotions = require('./models/promotions');
@@ -33,8 +35,9 @@ const Favorites = require('./models/favorites')
 
 const url = config.mongoUrl;
 //connet mongoose
-mongoose.connect(url);
+mongoose.connect(url,{ useNewUrlParser: true, useUnifiedTopology: true });
 let db =mongoose.connection;
+
 
 //Add entry to database
 const promotion1 = new Promotions({
@@ -94,6 +97,7 @@ leader1.save((err) => {
 db.once('open',function(){
   console.log('connected to MongoDB');
 })
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 //const url = 'mongodb://localhost:27017/conFusion';
 //const connect = mongoose.connect(url, {useMongoClient: true});
